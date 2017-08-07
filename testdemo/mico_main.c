@@ -35,6 +35,8 @@ int application_start(void)
     OSStatus err = kNoErr;
     mico_Context_t *mico_context;
     app_context_t *app_context;
+    mscp_result_t result;
+    ADUIO_SYSTEM_FW_INFO_S firmware_info_p;
 
     /* Create application context */
     app_context = (app_context_t *)calloc(1, sizeof(app_context_t));
@@ -65,6 +67,27 @@ int application_start(void)
 
     err = start_test_thread();
     require_noerr(err, exit);
+
+    audio_service_system_get_fw_info(&result, &firmware_info_p);
+    app_log("\r\nmx1200_ver = V%d.%d.%d\r\n"
+            "sound_remind_ver = V%d.%d.%d\r\n"
+            "hardware_ver = V%d.%d\r\n"
+            "mx1200_fw_name_len = %d\r\n"
+            "mx1200_fw_name[64] = %s\r\n"
+            "sound_remind_fw_name_len = %d\r\n"
+            "sound_remind_fw_name[64] = %s",
+            firmware_info_p.mx1200_ver_major,
+            firmware_info_p.mx1200_ver_minor,
+            firmware_info_p.mx1200_ver_revision,
+            firmware_info_p.sound_remind_ver_major,
+            firmware_info_p.sound_remind_ver_minor,
+            firmware_info_p.sound_remind_ver_revision,
+            firmware_info_p.hardware_ver_major,
+            firmware_info_p.hardware_ver_minor,
+            firmware_info_p.mx1200_fw_name_len,
+            firmware_info_p.mx1200_fw_name,
+            firmware_info_p.sound_remind_fw_name_len,
+            firmware_info_p.sound_remind_fw_name);
 
 exit:
     mico_system_notify_remove(mico_notify_WIFI_STATUS_CHANGED,
